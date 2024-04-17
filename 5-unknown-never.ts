@@ -1,3 +1,5 @@
+export {}
+
 let userInput: unknown; // not same as any
 let userName: string;
 

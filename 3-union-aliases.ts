@@ -1,3 +1,5 @@
+export {}
+
 type ConversionDescriptor = "as-number" | "as-text";
 
 function combine(
