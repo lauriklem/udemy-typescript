@@ -1,3 +1,4 @@
+export {}
 abstract class Department {
   static fiscalYear = 2020;
   // private id: string;
