@@ -1,29 +1,43 @@
-import { Product } from "./product.model";
-import "reflect-metadata";
-import { plainToInstance } from "class-transformer";
-import { validate } from "class-validator";
+import axios from "axios";
 
-const products = [
-  { title: "A carpet", price: 29.99 },
-  { title: "A book", price: 19.99 },
-];
+const form = document.querySelector("form")!;
+const addressInput = document.getElementById("address")! as HTMLInputElement;
 
-const newProd = new Product("", -5.99);
-validate(newProd).then((errors) => {
-  if (errors.length > 0) {
-    console.log(errors);
-  } else {
-    console.log(newProd.getInformation());
-  }
-});
-// const p1 = new Product("A book", 12.99);
+const GOOGLE_API_KEY = "AIzaSyC7yDJxglfJWQIntiAVLeer8CQ8ZBsXfIs";
 
-// const loadedProducts = products.map((prod) => {
-//   return new Product(prod.title, prod.price);
-// });
+function searchAddressHandler(event: Event) {
+  event.preventDefault();
+  const enteredAddress = addressInput.value;
 
-const loadedProducts = plainToInstance(Product, products);
+  axios
+    .get(
+      `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURI(
+        enteredAddress
+      )}&key=${GOOGLE_API_KEY}
+      `
+    )
+    .then((response) => {
+      if (response.data.status !== "OK") {
+        throw new Error("Could not fetch location");
+      }
+      const coordinates = response.data.results[0].geometry.location;
+      const map = new google.maps.Map(
+        document.getElementById("map") as HTMLDivElement,
+        {
+          center: coordinates,
+          zoom: 16,
+        }
+      );
 
-for (const prod of loadedProducts) {
-  console.log(prod.getInformation());
+      new google.maps.Marker({
+        position: coordinates,
+        map: map,
+      });
+    })
+    .catch((err) => {
+      alert(err.message);
+      console.log(err);
+    });
 }
+
+form.addEventListener("submit", searchAddressHandler);
